@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>WinLab32 - Simulador de Absorción Atómica Profesional</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f4f8; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .header-block { text-align: center; border-bottom: 3px solid #1a365d; padding-bottom: 15px; margin-bottom: 25px; }
+        h1 { color: #1a365d; margin: 0; font-size: 22px; text-transform: uppercase; }
+        .subtitle { color: #4a5568; margin: 5px 0 0 0; font-size: 13px; font-weight: 600; }
+        .tabs { display: flex; border-bottom: 2px solid #e2e8f0; margin-bottom: 25px; gap: 5px; }
+        .tab-btn { padding: 12px 20px; border: 1px solid #e2e8f0; border-bottom: none; background: #edf2f7; cursor: pointer; font-size: 13px; font-weight: bold; color: #4a5568; border-radius: 6px 6px 0 0; }
+        .tab-btn.active { background: white; color: #2b6cb0; border-top: 4px solid #2b6cb0; border-bottom: 2px solid white; margin-bottom: -2px; }
+        .tab-content { display: none; padding: 10px 5px; }
+        .tab-content.active { display: block; }
+        .group { border: 1px solid #e2e8f0; padding: 20px; border-radius: 8px; margin-bottom: 20px; background: #f7fafc; }
+        h4 { margin-top: 0; color: #2c5282; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        label { display: block; margin: 12px 0 6px; font-weight: bold; color: #2d3748; font-size: 14px; }
+        input, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 14px; }
+        .checkbox-group { display: flex; align-items: center; margin: 12px 0; background: white; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .checkbox-group input { margin-right: 12px; transform: scale(1.2); cursor: pointer; }
+        button { background: #2b6cb0; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; width: 100%; margin-top: 10px; }
+        button:hover { background: #2c5282; }
+        .console { background: #1a202c; color: #cbd5e0; padding: 18px; font-family: monospace; border-radius: 6px; margin-top: 20px; white-space: pre-wrap; line-height: 1.5; font-size: 13px; border-left: 5px solid #4a5568; }
+        .btn-analyze { background: #c53030; }
+        .btn-analyze:hover { background: #9b2c2c; }
+        .btn-export { background: #319795; display: none; margin-top: 20px; padding: 14px; font-size: 15px; }
+        #box-grafica { width: 100%; max-width: 400px; height: 150px; border-left: 3px solid #4a5568; border-bottom: 3px solid #4a5568; margin: 20px auto 0 auto; position: relative; display: none; background: #fff; }
+        .linea-tendencia { position: absolute; bottom: 0; left: 0; width: 120%; height: 2px; background: #dd6b20; transform: rotate(-25deg); transform-origin: bottom left; }
+        .punto-grafico { position: absolute; width: 8px; height: 8px; background: #3182ce; border-radius: 50%; }
+        @media print { .no-print { display: none !important; } body { background: white; padding: 0; } .container { box-shadow: none; padding: 0; max-width: 100%; border: none; } .console { background: white; color: black; border: 1px solid #cbd5e0; } }
+    </style>
+</head>
+<body>
+
+<div class="container" id="todo-el-programa">
+    <div class="header-block">
+        <h1>Espectrómetro de Absorción Atómica - WinLab32</h1>
+        <div class="subtitle">SISTEMA INTERNO DE AUDITORÍA Y TRAZABILIDAD METROLÓGICA</div>
+    </div>
+    
+    <div class="tabs no-print">
+        <button class="tab-btn active" id="btn1" onclick="cmdPestana(1)">Pestaña 1: Hardware</button>
+        <button class="tab-btn" id="btn2" onclick="cmdPestana(2)">Pestaña 2: Sample Info</button>
+        <button class="tab-btn" id="btn3" onclick="cmdPestana(3)">Pestaña 3: Calibración</button>
+        <button class="tab-btn" id="btn4" onclick="cmdPestana(4)">Pestaña 4: Análisis</button>
+    </div>
+
+    <!-- Pestaña 1 -->
+    <div id="div1" class="tab-content active">
+        <h3>🔧 Configuración de Hardware y Líneas de Gases</h3>
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div class="group" style="flex: 1; min-width: 250px;">
+                <h4>📦 Opción A: Técnica de Llama</h4>
+                <div class="checkbox-group"><input type="checkbox" id="purga"> <label for="purga">Abrir registro y purgar compresor</label></div>
+                <button onclick="cmdLlama()">🔥 Activar Llama (F10)</button>
+            </div>
+            <div class="group" style="flex: 1; min-width: 250px;">
+                <h4>🔬 Opción B: Horno de Grafito AS900</h4>
+                <div class="checkbox-group"><input type="checkbox" id="m1"> <label for="m1">Desmontar quemador de llama en zig-zag</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="m2"> <label for="m2">Extraer tubo con gancho de madera</label></div>
+                <div class="checkbox-group"><input type="checkbox" id="m3"> <label for="m3">Limpiar lentes con papel de arroz</label></div>
+                <button onclick="cmdHorno()">⚙️ Configurar Bloque de Horno</button>
+            </div>
+        </div>
+        <div id="out1" class="console">Consola del sistema: Esperando inicialización física del instrumental...</div>
+    </div>
+
+    <!-- Pestaña 2 -->
+    <div id="div2" class="tab-content">
+        <h3>📄 Registro Obligatorio de Operador y Muestras (Sample Info)</h3>
+        <div class="group">
+            <h4>🔐 Datos de Trazabilidad</h4>
+            <label>Nombre del Operador Analista:</label><input type="text" id="operador" placeholder="Ej: Marisa Ruiz">
+            <label>Número de Legajo / Matrícula:</label><input type="text" id="legajo" placeholder="Ej: GEO-2026">
+            <h4>📦 Identificación de la Muestra</h4>
+            <label>Batch ID (ID Lote):</label><input type="text" id="batch" placeholder="Ej: LOTE_MINERO_01">
+            <label>Sample ID (ID Muestra):</label><input type="text" id="sample" placeholder="Ej: SUELO-PB-05">
+            <label>A/S Location (Posición física en carrusel 1-50):</label><input type="number" id="posicion" placeholder="Ej: 5">
+            <button onclick="cmdGuardarDatos()" style="background:#4a5568; margin-top: 20px;">💾 Firmar y Guardar Tabla Sample Info</button>
+        </div>
+        <div id="out2" class="console">Consola de Seguridad: Sistema en espera de registro técnico...</div>
+    </div>
+
+    <!-- Pestaña 3 -->
+    <div id="div3" class="tab-content">
+        <h3>📈 Verificación del Coeficiente de Regresión Lineal (F6)</h3>
+        <button onclick="cmdCalibrar()">📈 Ejecutar Calibración de Estándares</button>
+        <div id="out3" class="console">Control de Calidad (QC): Instrumental sin curvas de calibración vigentes.</div>
+        <div id="box-grafica">
+            <div class="linea-tendencia"></div>
+            <div class="punto-grafico" style="bottom: 10%; left: 10%;"></div>
+            <div class="punto-grafico" style="bottom: 25%; left: 30%;"></div>
+            <div class="punto-grafico" style="bottom: 45%; left: 50%;"></div>
+            <div class="punto-grafico" style="bottom: 65%; left: 70%;"></div>
+            <div class="punto-grafico" style="bottom: 85%; left: 90%;"></div>
+        </div>
+    </div>
+
+    <!-- Pestaña 4 -->
+    <div id="div4" class="tab-content">
+        <h3>🔬 Lectura por Espectrometría y Emisión de Reporte</h3>
+        <div class="group no-print">
+            <label>Seleccione Analito y Técnica correspondiente:</label>
+            <select id="elemento">
+                <option value="Calcio (Ca) - Llama">Calcio (Ca) - Técnica de Llama</option>
+                <option value="Magnesio (Mg) - Llama">Magnesio (Mg) - Técnica de Llama</option>
+                <option value="Plomo (Pb) - Horno">Plomo (Pb) - Horno de Grafito</option>
+            </select>
+            <button class="btn-analyze" onclick="cmdLectura()">🔬 Ejecutar Lectura Óptica (Analyze All)</button>
+        </div>
+        <div id="out4" class="console">Gabinete de Reportes: En espera de lecturas analíticas...</div>
+        <button class="btn-export no-print" id="btn-pdf" onclick="window.print()">📄 Exportar Certificado como PDF / Imprimir</button>
+    </div>
+</div>
+
+<script>
+    var sys_tecnica = "Ninguna";
+    var sys_calibrado = false;
+    var sys_batch_id = "";
+    var sys_sample_id = "";
+    var sys_operador = "";
+    var sys_legajo = "";
+    var sys_timestamp = "";
+    var sys_r2 = 0;
+    var sys_posicion = "";
+
+    function cmdPestana(num) {
+        for (var i = 1; i <= 4; i++) {
+            document.getElementById("div" + i).style.display = "none";
+            document.getElementById("btn" + i).className = "tab-btn";
+        }
+        document.getElementById("div" + num).style.display = "block";
+        document.getElementById("btn" + num).className = "tab-btn active";
+    }
+
+    function cmdLlama() {
+        if(!document.getElementById('purga').checked) {
+            document.getElementById('out1').innerHTML = "<span style='color:#c53030;'>⚠️ ERROR: Purgue el compresor antes del encendido (Pág 5).</span>";
+            return;
+        }
+        sys_tecnica = "LLAMA"; 
+        sys_calibrado = false;
+        document.getElementById('out1').innerHTML = "<span style='color:#2f855a;'>🔥 [MODO LLAMA ONLINE]: Flujos estables. Llama encendida con éxito (F10).</span>";
+    }
+
+    function cmdHorno() {
+        if(!document.getElementById('m1').checked || !document.getElementById('m2').checked || !document.getElementById('m3').checked) {
+            document.getElementById('out1').innerHTML = "<span style='color:#c53030;'>⚠️ ERROR: Complete todos los pasos de inspección física obligatorios (Pág 8).</span>";
+            return;
+        }
+        sys_tecnica = "HORNO"; 
+        sys_calibrado = false;
